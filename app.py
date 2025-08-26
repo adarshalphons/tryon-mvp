@@ -1,6 +1,11 @@
 import streamlit as st
 from PIL import Image
 
+import tempfile
+from gradio_client import Client, file as gradio_file
+
+ENGINE_URL = "https://0ef55631dd62f98ab7.gradio.live/"
+
 st.set_page_config(page_title="NINE (MVP Demo)", page_icon=":eyes:", layout="centered")
 
 st.title("NINE (MVP Demo)")
@@ -68,12 +73,23 @@ if generate:
         if not ok_p or not ok_g:
             st.error("Safety check failed. Please upload a different image.")
         else:
-            st.info("PlceholderL try-on engine will be connected soon.")
-            st.image(person_img, caption="(Placeholder) Result will appear here", use_container_width=True)
-
-
-
-
+            with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as ptmp:
+                person_img.save(ptmp.name, "JPEG", quality=95)
+                person_path = ptmp.name
+            with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as gtmp:
+                garment_img.save(gtmp.name, "JPEG", quality=95)
+                garment_path = gtmp.name
+            try:
+                st.info("Connecting to try-on engine...")
+                client = Client(ENGINE_URL)
+                result = client.predict(
+                    gradio_file(person_path),
+                    gradio_file(garment_path),
+                    api_name="/predict"
+                )
+                st.image(result, caption="Try-on result", use_container_width=True)
+            except Exception as e:
+                st.error(f"Engine Error: {e}")
 
 
 st.markdown("---")
