@@ -49,25 +49,6 @@ if generate:
     elif not person_file or not garment_file:
         st.error("Please upload both person's image and garment image.")
     else:
-        st.info("This is a placeholder. The AI engine will be connected soon.")
-        result_area.image(person_img, caption="(Placeholder) Try-On image will appear here", use_container_width=True)
-
-
-def placeholder_safety_check_person(img):
-    # TODO: replace with actual safety check
-    return True, "OK"
-
-def placeholder_safety_check_garment(img):
-    # TODO: replace with actual safety check
-    return True, "OK"
-
-
-if generate:
-    if not consent:
-        st.error("Please check the consent box before continuing.")
-    elif not person_file or not garment_file:
-        st.error("Please upload both person's image and garment image.")
-    else:
         ok_p, _ = placeholder_safety_check_person(person_img)
         ok_g, _ = placeholder_safety_check_garment(garment_img)
         if not ok_p or not ok_g:
@@ -91,6 +72,21 @@ if generate:
             except Exception as e:
                 st.error(f"Engine Error: {e}")
 
+def placeholder_safety_check_person(img):
+    # TODO: replace with actual safety check
+    return True, "OK"
+
+def placeholder_safety_check_garment(img):
+    # TODO: replace with actual safety check
+    return True, "OK"
+
+import glob
+st.markdown("### Sample Results (backup)")
+gallery = sorted(glob.glob("outputs/*.jpg"))
+if gallery:
+    st.image(gallery, caption=[f"Sample Results {i+1}" for i in range(len(gallery))], use_container_width=True)
+else:
+    st.caption("No samples yet. Add images to the outputs/ folder.")
 
 st.markdown("---")
 
