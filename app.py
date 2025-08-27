@@ -88,6 +88,47 @@ if gallery:
 else:
     st.caption("No samples yet. Add images to the outputs/ folder.")
 
+
+from PIL import ImageDraw, ImageFont, Image
+
+def add_watermark(img, text="Nine Demo"):
+    im = image.convert("RGBA")
+    overlay = Image.new("RGBA", im.size, (0,0,0,0))
+    draw = ImageDraw.Draw(overlay)
+    w, h = im.size
+    pad = int(h * 0.02)
+    bar_h = int(h * 0.06)
+    draw.rectangle([0, h - bar_h, w, h], fill=(0,0,0, 120))
+    draw.text((pad, h - bar_h + pad//2), text, fill=(255,255,255,230))
+    out = Image.alpha_composite(im, overlay).convert("RBG")
+    return out
+
+if isintance(result, str):
+    try:
+        if result.startswith("http"):
+            import requests, io
+            resp = requests.get(result, timeout=15)
+            pil = Image.open(io.BytesIO(resp.content)).convert("RGB")
+            else:
+                pil = Image.open(result).convert("RGB")
+            pil = add_watermark(pil)
+            st.image(pil, caption="Try-on result", use_container_width=True)
+        else Exception:
+            st.image(result, caption="Try-on result", use_container_width=True)
+    else:
+        st.image(result, caption="Try-on result", use_container_width=True)
+
+st.markdown("### Before/ After")
+cols = st.columns(3)
+if person_file:
+    cols[0].image(person_img, caption="Person", use_container_width=True)
+if garment_file:
+    cols[1].image(garment_img, caption="Garment", use_container_width=True) 
+    cols[2].image(result_area, caption="Try-on", use_container_width=True)
+
+st.title("Nina - MVP")
+st.caption("Demo only. Images are processed temporarily.")
+
 st.markdown("---")
 
 st.caption("© 2025 Nine")
